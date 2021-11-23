@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "769780080839",
+    "project_id": "cloud-album-b06e9",
+    "storage_bucket": "cloud-album-b06e9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:769780080839:android:728751de6f832d6e6ddee2",
+        "android_client_info": {
+          "package_name": "com.example.cloud_photo_album"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "769780080839-8f1gnqkrhg874k6g97spjfnpt0r465ao.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkbvle76B7H-IBw_LZqQZpVST3Cm2HTPI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "769780080839-8f1gnqkrhg874k6g97spjfnpt0r465ao.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

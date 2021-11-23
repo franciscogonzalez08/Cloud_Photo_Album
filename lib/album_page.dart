@@ -1,6 +1,9 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'provider/google_sing_in.dart';
 
 class AlbumPage extends StatelessWidget {
   const AlbumPage({Key? key}) : super(key: key);
@@ -38,7 +41,9 @@ class AlbumPage extends StatelessWidget {
               onTap: () {},
               child: TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    final provider = Provider.of<GoogleSignInProvider>(context,
+                        listen: false);
+                    provider.logout();
                   },
                   child: Text(
                     'Log out',
