@@ -2,7 +2,6 @@
 
 import 'package:cloud_photo_album/album_page.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -38,8 +37,10 @@ class HomePage extends StatelessWidget {
                     backgroundColor: MaterialStateProperty.all(Colors.white),
                   ),
                   onPressed: () {
-                    Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => AlbumPage()));
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => AlbumPage(
+                              currentFolderId: 1,
+                            )));
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -75,8 +76,10 @@ class HomePage extends StatelessWidget {
                     backgroundColor: MaterialStateProperty.all(
                         Color.fromARGB(255, 20, 120, 243))),
                 onPressed: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => AlbumPage()));
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => AlbumPage(
+                            currentFolderId: 1,
+                          )));
                 },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
