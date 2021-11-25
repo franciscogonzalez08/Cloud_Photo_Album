@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, avoid_print
 
 import 'package:cloud_photo_album/album_page.dart';
 import 'package:cloud_photo_album/provider/google_sing_in.dart';
@@ -16,6 +16,9 @@ class HomePage extends StatelessWidget {
       body: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
+          //String snapshotString = snapshot.data!
+          //.toString(); // TODO: DBUG THIS, REMEMBER, CURRENT BRANCH IS MAIN
+          // snapshotString.substring(snapshotString.indexOf('uid'));
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasData) {

@@ -122,7 +122,7 @@ class _AlbumPageState extends State<AlbumPage> {
 
   Future<void> getFolderData() async {
     var url = Uri.parse(
-        'http://10.0.2.2:3000/folder?folderId=${widget.currentFolderId}'); // https://es.stackoverflow.com/questions/345783/se-produjo-una-excepci%C3%B3n-socketexception-socketexception-os-error-connection
+        'http://photoalbumapi-env.eba-z3bpuujp.us-east-1.elasticbeanstalk.com/folder?folderId=${widget.currentFolderId}'); // https://es.stackoverflow.com/questions/345783/se-produjo-una-excepci%C3%B3n-socketexception-socketexception-os-error-connection
     Response response = await get(url);
     if (response.statusCode == 200) {
       var body = json.decode(response.body);
