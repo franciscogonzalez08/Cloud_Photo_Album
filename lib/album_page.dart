@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, prefer_const_constructors_in_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, prefer_const_constructors_in_immutables, prefer_final_fields
 
 import 'dart:convert';
 
@@ -15,11 +15,19 @@ class AlbumPage extends StatefulWidget {
 }
 
 class _AlbumPageState extends State<AlbumPage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _future = getFolderData();
+  }
+
   // Variables
   var textController = TextEditingController();
   List userFolders = [];
   List userImages = [];
   String currentFolderName = '';
+  var _future;
 
   // Methods
   Widget createFolder(folder, context, width) {
@@ -110,7 +118,7 @@ class _AlbumPageState extends State<AlbumPage> {
     );
   }
 
-  getFolderData() async {
+  Future<void> getFolderData() async {
     var url = Uri.parse(
         'http://10.0.2.2:3000/folder?folderId=${widget.currentFolderId}'); // https://es.stackoverflow.com/questions/345783/se-produjo-una-excepci%C3%B3n-socketexception-socketexception-os-error-connection
     Response response = await http.get(url);
@@ -150,7 +158,7 @@ class _AlbumPageState extends State<AlbumPage> {
     double vh = height / 100;
 
     return FutureBuilder(
-        future: getFolderData(),
+        future: _future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return Scaffold(
@@ -239,8 +247,8 @@ class _AlbumPageState extends State<AlbumPage> {
                               prefixIcon: IconButton(
                                 padding: EdgeInsets.zero,
                                 onPressed: () {
-                                  FocusScope.of(context)
-                                      .requestFocus(FocusNode());
+                                  // FocusScope.of(context)
+                                  //     .requestFocus(FocusNode());
                                   print(
                                       'Searching'); // TODO: Implement filter by name
                                 },
