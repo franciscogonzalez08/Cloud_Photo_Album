@@ -3,8 +3,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:provider/provider.dart';
+
+import 'provider/google_sing_in.dart';
 
 class AlbumPage extends StatefulWidget {
   final int currentFolderId;
@@ -121,7 +123,7 @@ class _AlbumPageState extends State<AlbumPage> {
   Future<void> getFolderData() async {
     var url = Uri.parse(
         'http://10.0.2.2:3000/folder?folderId=${widget.currentFolderId}'); // https://es.stackoverflow.com/questions/345783/se-produjo-una-excepci%C3%B3n-socketexception-socketexception-os-error-connection
-    Response response = await http.get(url);
+    Response response = await get(url);
     if (response.statusCode == 200) {
       var body = json.decode(response.body);
       userFolders = body['folders'];
@@ -200,7 +202,10 @@ class _AlbumPageState extends State<AlbumPage> {
                       onTap: () {},
                       child: TextButton(
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            final provider = Provider.of<GoogleSignInProvider>(
+                                context,
+                                listen: false);
+                            provider.logout();
                           },
                           child: Text(
                             'Log out',
@@ -339,7 +344,10 @@ class _AlbumPageState extends State<AlbumPage> {
                       onTap: () {},
                       child: TextButton(
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            final provider = Provider.of<GoogleSignInProvider>(
+                                context,
+                                listen: false);
+                            provider.logout();
                           },
                           child: Text(
                             'Log out',
