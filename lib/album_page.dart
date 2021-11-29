@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, prefer_const_constructors_in_immutables, prefer_final_fields, prefer_typing_uninitialized_variables, avoid_print, unused_local_variable
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_photo_album/map_page.dart';
 import 'package:cloud_photo_album/photo_page.dart';
@@ -29,7 +30,6 @@ class _AlbumPageState extends State<AlbumPage> {
   @override
   void initState() {
     super.initState();
-    _future = getFolderData();
   }
 
   // Variables
@@ -38,7 +38,6 @@ class _AlbumPageState extends State<AlbumPage> {
   List userFolders = [];
   List userImages = [];
   String currentFolderName = '';
-  var _future;
 
   // Methods
   Widget createFolder(folder, context, width, userId) {
@@ -175,7 +174,7 @@ class _AlbumPageState extends State<AlbumPage> {
     double vh = height / 100;
 
     return FutureBuilder(
-        future: _future,
+        future: getFolderData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return Scaffold(
@@ -197,9 +196,9 @@ class _AlbumPageState extends State<AlbumPage> {
                         ),
                         elevation: 20,
                         enabled: true,
-                        onSelected: (value) {
+                        onSelected: (value) async {
                           if (value == 'image') {
-                            Navigator.of(context).push(
+                            await Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => PhotoPage(
                                   userId: widget.userId,
@@ -207,6 +206,7 @@ class _AlbumPageState extends State<AlbumPage> {
                                 ),
                               ),
                             );
+                            setState(() {});
                           } else if (value == 'folder') {
                             showDialog(
                               context: context,
@@ -252,6 +252,7 @@ class _AlbumPageState extends State<AlbumPage> {
                                           body: jsonEncode(folder));
                                       if (response.statusCode == 200) {
                                         print('Folder created');
+                                        setState(() {});
                                       } else {
                                         print(
                                             'Error creating folder, statusCode: ${response.statusCode}');
@@ -429,9 +430,9 @@ class _AlbumPageState extends State<AlbumPage> {
                         ),
                         elevation: 20,
                         enabled: true,
-                        onSelected: (value) {
+                        onSelected: (value) async {
                           if (value == 'image') {
-                            Navigator.of(context).push(
+                            await Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => PhotoPage(
                                   userId: widget.userId,
@@ -439,6 +440,7 @@ class _AlbumPageState extends State<AlbumPage> {
                                 ),
                               ),
                             );
+                            setState(() {});
                           } else if (value == 'folder') {
                             showDialog(
                               context: context,

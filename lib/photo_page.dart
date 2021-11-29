@@ -25,6 +25,7 @@ class PhotoPage extends StatefulWidget {
 class _PhotoPageState extends State<PhotoPage> {
   // Variables
   List<File> arrImages = [];
+  String uploadImgButtonText = 'Upload images';
   // List<Asset> images = [];
   // bool? includeLocation = false;
   // List photoTags = [Item(title: 'Hello')];
@@ -131,7 +132,7 @@ class _PhotoPageState extends State<PhotoPage> {
                   // Upload images to S3 Bucket
                 },
                 child: Text(
-                  'Choose images',
+                  'Choose image',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.black,
@@ -176,119 +177,19 @@ class _PhotoPageState extends State<PhotoPage> {
                     ? null
                     : () async {
                         // Upload images to S3 Bucket
-
+                        setState(() {
+                          uploadImgButtonText = 'Uploading...';
+                        });
                         for (File imgFile in arrImages) {
                           await upload(imgFile);
-                          // String base64Image =
-                          //     base64Encode(imgFile.readAsBytesSync());
-
-                          // var url =
-                          //     Uri.parse('http://3.236.222.168:3000/image');
-                          // var img = {
-                          //   "name": imgFile.path,
-                          //   "userId": widget.userId,
-                          //   "folderId": widget.folderId,
-                          //   "tags": '[]',
-                          //   "file": base64Image
-                          // };
-
-                          // Response response = await post(url,
-                          //     headers: {'Content-Type': 'multipart/form-data'},
-                          //     body: jsonEncode(img));
-                          // if (response.statusCode == 200) {
-                          //   print('image uploaded');
-                          // } else {
-                          //   print('error');
-                          //   print(response.statusCode);
-                          // }
-
-                          // String fileExtension = imgFile.path.substring(
-                          //   imgFile.path.lastIndexOf('.') + 1,
-                          // );
-
-                          //  MultipartRequest request =
-                          //     MultipartRequest('POST', url);
-                          // request.files.add(
-                          //   MultipartFile.fromBytes(
-                          //     'file',
-                          //     await File.fromUri(Uri.parse(imgFile.path))
-                          //         .readAsBytes(),
-                          //     contentType: MediaType('image', fileExtension),
-                          //   ),
-                          // );
-
-                          // request.fields['name'] = imgFile.path;
-                          // request.fields['userId'] = widget.userId;
-                          // request.fields['folderId'] = '${widget.folderId}';
-                          // request.fields['tags'] = '[]';
-
-                          // try {
-                          //   StreamedResponse response = await request.send();
-                          //   print(response.statusCode);
-                          // } catch (e) {
-                          //   print('Error: $e');
-                          // }
                         }
-                        print('uploading');
 
-                        // for (var img in images) {
-                        //   var imgAsBytes = await img.getByteData();
-
-                        //   var url = Uri.parse(
-                        //       'http://photoalbumapi-env.eba-z3bpuujp.us-east-1.elasticbeanstalk.com/image');
-
-                        //   String fileExtension = img.name!.substring(
-                        //     img.name!.lastIndexOf('.') + 1,
-                        //   );
-
-                        //   final buffer = imgAsBytes.buffer;
-
-                        // //String uriString = img.identifier!;
-                        // //Uri uri = Uri.parse(uriString);
-                        // //print('About to use package...');
-                        //// var newImage = Image.file(img);
-                        //   print('About to add file...');
-                        //   MultipartRequest request =
-                        //       MultipartRequest('POST', url);
-                        //   request.files.add(
-                        //     MultipartFile.fromBytes(
-                        //       'file',
-                        //       buffer.asUint8List(imgAsBytes.offsetInBytes,
-                        //           imgAsBytes.lengthInBytes),
-                        //       contentType: MediaType('image', fileExtension),
-                        //     ),
-                        //   );
-
-                        //   request.fields['name'] = img.name!;
-                        //   request.fields['userId'] = widget.userId;
-                        //   request.fields['folderId'] = '${widget.folderId}';
-                        //   request.fields['tags'] = '[]';
-                        //   print(request.files[0].filename);
-
-                        //   print('About to do request...');
-                        //   try {
-                        //     StreamedResponse response = await request.send();
-                        //     print(response.statusCode);
-                        //     print(response.stream);
-                        //   } catch (e) {
-                        //     print('Error: $e');
-                        //   }
-
-                        //   // Response response = await post(url,
-                        //   //     headers: {
-                        //   //       'Content-Type': 'multipart/form-data',
-                        //   //     },
-                        //   //     body: jsonEncode(image));
-                        //   // if (response.statusCode == 200) {
-                        //   //   print('image ${img.name} created');
-                        //   // } else {
-                        //   //   print(
-                        //   //       'Error uploading image #${img.name}, statusCode: ${response.statusCode}');
-                        //   // }
-                        // }
+                        sleep(Duration(
+                            seconds: 4)); // Wait for thumbnail creation
+                        Navigator.pop(context);
                       },
                 child: Text(
-                  'Upload images',
+                  uploadImgButtonText,
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.black,
