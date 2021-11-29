@@ -1,7 +1,9 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, prefer_const_constructors_in_immutables, prefer_final_fields
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, prefer_const_constructors_in_immutables, prefer_final_fields, prefer_typing_uninitialized_variables, avoid_print, unused_local_variable
 
 import 'dart:convert';
 
+import 'package:cloud_photo_album/map_page.dart';
+import 'package:cloud_photo_album/photo_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +12,14 @@ import 'provider/google_sing_in.dart';
 
 class AlbumPage extends StatefulWidget {
   final int currentFolderId;
-  AlbumPage({Key? key, required this.currentFolderId}) : super(key: key);
+  final bool isRootFolder;
+  final String userId;
+  AlbumPage(
+      {Key? key,
+      required this.currentFolderId,
+      required this.isRootFolder,
+      required this.userId})
+      : super(key: key);
 
   @override
   State<AlbumPage> createState() => _AlbumPageState();
@@ -19,20 +28,20 @@ class AlbumPage extends StatefulWidget {
 class _AlbumPageState extends State<AlbumPage> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _future = getFolderData();
   }
 
   // Variables
   var textController = TextEditingController();
+  var folderNameController = TextEditingController();
   List userFolders = [];
   List userImages = [];
   String currentFolderName = '';
   var _future;
 
   // Methods
-  Widget createFolder(folder, context, width) {
+  Widget createFolder(folder, context, width, userId) {
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
@@ -43,6 +52,8 @@ class _AlbumPageState extends State<AlbumPage> {
               MaterialPageRoute(
                 builder: (context) => AlbumPage(
                   currentFolderId: folder["folderId"],
+                  isRootFolder: false,
+                  userId: userId,
                 ),
               ),
             );
@@ -76,6 +87,9 @@ class _AlbumPageState extends State<AlbumPage> {
             showDialog(
               context: context,
               builder: (BuildContext context) => AlertDialog(
+                contentPadding: EdgeInsets.zero,
+                insetPadding:
+                    EdgeInsets.symmetric(horizontal: 10.0, vertical: 24.0),
                 content: Image.network(
                   '${image["url"]}',
                   fit: BoxFit.cover,
@@ -122,7 +136,8 @@ class _AlbumPageState extends State<AlbumPage> {
 
   Future<void> getFolderData() async {
     var url = Uri.parse(
-        'http://photoalbumapi-env.eba-z3bpuujp.us-east-1.elasticbeanstalk.com/folder?folderId=${widget.currentFolderId}'); // https://es.stackoverflow.com/questions/345783/se-produjo-una-excepci%C3%B3n-socketexception-socketexception-os-error-connection
+        'http://photoalbumapi-env.eba-z3bpuujp.us-east-1.elasticbeanstalk.com/folder?folderId=${widget.currentFolderId}&userId=${widget.userId}');
+    print('url: $url'); // DBUG
     Response response = await get(url);
     if (response.statusCode == 200) {
       var body = json.decode(response.body);
@@ -134,11 +149,11 @@ class _AlbumPageState extends State<AlbumPage> {
     }
   }
 
-  List<Widget> renderUserData(context, width) {
+  List<Widget> renderUserData(context, width, userId) {
     List<Widget> userData = [];
     // Create folders
     for (var folder in userFolders) {
-      userData.add(createFolder(folder, context, width));
+      userData.add(createFolder(folder, context, width, userId));
     }
     // Create images
     for (var image in userImages) {
@@ -147,7 +162,7 @@ class _AlbumPageState extends State<AlbumPage> {
     return userData;
   }
 
-  String dropdownValue = 'View: Grid';
+  String girdViewDropdownValue = 'View: Grid';
 
   @override
   Widget build(BuildContext context) {
@@ -167,34 +182,98 @@ class _AlbumPageState extends State<AlbumPage> {
               backgroundColor: Colors.amber[50],
               appBar: AppBar(
                 automaticallyImplyLeading: false,
-                leading:
-                    widget.currentFolderId == 1 // !This might change later on
-                        ? null
-                        : BackButton(onPressed: () {
-                            Navigator.maybePop(
-                                context); // not sure of how it's different to pop(), but it says 'leading' uses this by default
-                          }),
+                leading: widget.isRootFolder
+                    ? null
+                    : BackButton(onPressed: () {
+                        Navigator.maybePop(
+                            context); // not sure of how it's different to pop(), but it says 'leading' uses this by default
+                      }),
                 actions: [
                   Padding(
                     padding: EdgeInsets.only(right: 10.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        print('Clicked'); // DBUG
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.add),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 1.0),
-                            child: Text(
-                              'New',
-                              style: TextStyle(fontSize: 20.0),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    child: PopupMenuButton(
+                        icon: Icon(
+                          Icons.add,
+                        ),
+                        elevation: 20,
+                        enabled: true,
+                        onSelected: (value) {
+                          if (value == 'image') {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => PhotoPage(
+                                  userId: widget.userId,
+                                  folderId: widget.currentFolderId,
+                                ),
+                              ),
+                            );
+                          } else if (value == 'folder') {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text('Create folder'),
+                                content: TextField(
+                                  controller: folderNameController,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 20.0),
+                                    border: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                      color: Colors.grey,
+                                    )),
+                                    hintText: 'Folder name',
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context, 'Cancel');
+                                    },
+                                    child: Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      Navigator.pop(context, 'OK');
+
+                                      var folder = {
+                                        "name": folderNameController.text,
+                                        "userId": widget.userId,
+                                        "folderId": widget.currentFolderId
+                                      };
+
+                                      print(folder);
+
+                                      var url = Uri.parse(
+                                          'http://photoalbumapi-env.eba-z3bpuujp.us-east-1.elasticbeanstalk.com/folder');
+                                      Response response = await post(url,
+                                          headers: {
+                                            'Content-Type':
+                                                'application/json; charset=UTF-8',
+                                          },
+                                          body: jsonEncode(folder));
+                                      if (response.statusCode == 200) {
+                                        print('Folder created');
+                                      } else {
+                                        print(
+                                            'Error creating folder, statusCode: ${response.statusCode}');
+                                      }
+                                    },
+                                    child: Text('Create'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        },
+                        itemBuilder: (context) => [
+                              PopupMenuItem(
+                                child: Text("Create folder"),
+                                value: "folder",
+                              ),
+                              PopupMenuItem(
+                                child: Text("Upload image"),
+                                value: "image",
+                              ),
+                            ]),
                   ),
                   Padding(
                     padding: EdgeInsets.only(right: 10.0),
@@ -216,7 +295,7 @@ class _AlbumPageState extends State<AlbumPage> {
                   ),
                 ],
                 backgroundColor: Colors.transparent,
-                title: widget.currentFolderId == 1
+                title: widget.isRootFolder
                     ? Text(
                         'Cloud photo Album',
                         textAlign: TextAlign.center,
@@ -282,11 +361,29 @@ class _AlbumPageState extends State<AlbumPage> {
                         DropdownButton(
                           onChanged: (String? newValue) {
                             setState(() {
-                              dropdownValue = newValue!;
+                              girdViewDropdownValue = newValue!;
+                              if (girdViewDropdownValue == 'View: Map') {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => MapPage(
+                                        currentFolderName: currentFolderName),
+                                  ),
+                                );
+                              } else if (girdViewDropdownValue ==
+                                  'View: Grid') {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => AlbumPage(
+                                        currentFolderId: widget.currentFolderId,
+                                        isRootFolder: widget.isRootFolder,
+                                        userId: widget.userId),
+                                  ),
+                                );
+                              }
                             });
                           },
                           elevation: 16,
-                          value: dropdownValue,
+                          value: girdViewDropdownValue,
                           items: <String>[
                             'View: Grid',
                             'View: List',
@@ -304,7 +401,7 @@ class _AlbumPageState extends State<AlbumPage> {
                   Expanded(
                     child: GridView.count(
                       crossAxisCount: 3,
-                      children: renderUserData(context, width),
+                      children: renderUserData(context, width, widget.userId),
                     ),
                   ),
                 ],
@@ -316,27 +413,99 @@ class _AlbumPageState extends State<AlbumPage> {
             return Scaffold(
               backgroundColor: Colors.amber[50],
               appBar: AppBar(
+                automaticallyImplyLeading: false,
+                leading: widget.isRootFolder
+                    ? null
+                    : BackButton(onPressed: () {
+                        Navigator.maybePop(
+                            context); // not sure of how it's different to pop(), but it says 'leading' uses this by default
+                      }),
                 actions: [
                   Padding(
                     padding: EdgeInsets.only(right: 10.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        print('Clicked'); // DBUG
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.add),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 1.0),
-                            child: Text(
-                              'New',
-                              style: TextStyle(fontSize: 20.0),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    child: PopupMenuButton(
+                        icon: Icon(
+                          Icons.add,
+                        ),
+                        elevation: 20,
+                        enabled: true,
+                        onSelected: (value) {
+                          if (value == 'image') {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => PhotoPage(
+                                  userId: widget.userId,
+                                  folderId: widget.currentFolderId,
+                                ),
+                              ),
+                            );
+                          } else if (value == 'folder') {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text('Create folder'),
+                                content: TextField(
+                                  controller: folderNameController,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 20.0),
+                                    border: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                      color: Colors.grey,
+                                    )),
+                                    hintText: 'Folder name',
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context, 'Cancel');
+                                    },
+                                    child: Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      Navigator.pop(context, 'OK');
+
+                                      var folder = {
+                                        "name": folderNameController.text,
+                                        "userId": widget.userId,
+                                        "folderId": widget.currentFolderId
+                                      };
+
+                                      print(folder);
+
+                                      var url = Uri.parse(
+                                          'http://photoalbumapi-env.eba-z3bpuujp.us-east-1.elasticbeanstalk.com/folder');
+                                      Response response = await post(url,
+                                          headers: {
+                                            'Content-Type':
+                                                'application/json; charset=UTF-8',
+                                          },
+                                          body: jsonEncode(folder));
+                                      if (response.statusCode == 200) {
+                                        print('Folder created');
+                                      } else {
+                                        print(
+                                            'Error creating folder, statusCode: ${response.statusCode}');
+                                      }
+                                    },
+                                    child: Text('Create'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        },
+                        itemBuilder: (context) => [
+                              PopupMenuItem(
+                                child: Text("Create folder"),
+                                value: "folder",
+                              ),
+                              PopupMenuItem(
+                                child: Text("Upload image"),
+                                value: "image",
+                              ),
+                            ]),
                   ),
                   Padding(
                     padding: EdgeInsets.only(right: 10.0),
@@ -357,8 +526,16 @@ class _AlbumPageState extends State<AlbumPage> {
                     ),
                   ),
                 ],
-                automaticallyImplyLeading: false,
                 backgroundColor: Colors.transparent,
+                title: widget.isRootFolder
+                    ? Text(
+                        'Cloud photo Album',
+                        textAlign: TextAlign.center,
+                      )
+                    : Text(
+                        currentFolderName,
+                        textAlign: TextAlign.center,
+                      ),
               ),
               body: Center(
                 child: CircularProgressIndicator(),
