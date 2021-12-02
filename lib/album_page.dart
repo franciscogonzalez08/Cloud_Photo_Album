@@ -15,11 +15,13 @@ class AlbumPage extends StatefulWidget {
   final int currentFolderId;
   final bool isRootFolder;
   final String userId;
+  final dynamic query;
   AlbumPage(
       {Key? key,
       required this.currentFolderId,
       required this.isRootFolder,
-      required this.userId})
+      required this.userId, 
+      this.query})
       : super(key: key);
 
   @override
@@ -134,15 +136,23 @@ class _AlbumPageState extends State<AlbumPage> {
   }
 
   Future<void> getFolderData() async {
-    var url = Uri.parse(
+    var url;
+    
+    if(widget.query == null) {
+      url = Uri.parse(
         'http://photoalbumapi-env.eba-z3bpuujp.us-east-1.elasticbeanstalk.com/folder?folderId=${widget.currentFolderId}&userId=${widget.userId}');
+    }
+    else {
+      url = Uri.parse(
+        'http://photoalbumapi-env.eba-z3bpuujp.us-east-1.elasticbeanstalk.com/folder/search?userId=${widget.userId}&query=${widget.query}');
+    }
     print('url: $url'); // DBUG
     Response response = await get(url);
     if (response.statusCode == 200) {
       var body = json.decode(response.body);
       userFolders = body['folders'];
       userImages = body['images'];
-      currentFolderName = body['folderName'];
+      currentFolderName = body['folderName'] ?? ""; // will be null in /folder/search
     } else {
       print('Error retrieving data, statusCode: ${response.statusCode}');
     }
@@ -190,7 +200,7 @@ class _AlbumPageState extends State<AlbumPage> {
                 actions: [
                   Padding(
                     padding: EdgeInsets.only(right: 10.0),
-                    child: PopupMenuButton(
+                    child: widget.query != null? null : PopupMenuButton(
                         icon: Icon(
                           Icons.add,
                         ),
@@ -334,8 +344,18 @@ class _AlbumPageState extends State<AlbumPage> {
                                 onPressed: () {
                                   // FocusScope.of(context)
                                   //     .requestFocus(FocusNode());
-                                  print(
-                                      'Searching'); // TODO: Implement filter by name
+                                  // CONTINUE
+                                  print('Searching: ' + textController.text);
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => AlbumPage(
+                                          currentFolderId: widget.currentFolderId,
+                                          isRootFolder: false,
+                                          userId: widget.userId, 
+                                          query: textController.text,
+                                      ),
+                                    ),
+                                  );
                                 },
                                 icon: Icon(
                                   Icons.search,
