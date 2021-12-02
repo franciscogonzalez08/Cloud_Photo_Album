@@ -43,8 +43,8 @@ class _PhotoPageState extends State<PhotoPage> {
     var length = await imageFile.length();
 
     // string to uri
-    // var uri = Uri.parse("http://3.236.222.168:3000/image");
-    var uri = Uri.parse("http://photoalbumapi-env.eba-z3bpuujp.us-east-1.elasticbeanstalk.com/image_legacy");
+    var uri = Uri.parse("http://3.236.222.168:3000/image");
+    //uri = Uri.parse("http://photoalbumapi-env.eba-z3bpuujp.us-east-1.elasticbeanstalk.com/image_legacy");
 
     // create multipart request
     var request = MultipartRequest("POST", uri);
