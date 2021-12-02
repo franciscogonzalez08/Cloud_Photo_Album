@@ -3,7 +3,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:cloud_photo_album/map_page.dart';
+// import 'package:cloud_photo_album/map_page.dart';
 import 'package:cloud_photo_album/photo_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -364,12 +364,13 @@ class _AlbumPageState extends State<AlbumPage> {
                             setState(() {
                               girdViewDropdownValue = newValue!;
                               if (girdViewDropdownValue == 'View: Map') {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => MapPage(
-                                        currentFolderName: currentFolderName),
-                                  ),
-                                );
+                                print('Map not available');
+                                // Navigator.of(context).push(
+                                //   MaterialPageRoute(
+                                //     builder: (context) => MapPage(
+                                //         currentFolderName: currentFolderName),
+                                //   ),
+                                // );
                               } else if (girdViewDropdownValue ==
                                   'View: Grid') {
                                 Navigator.of(context).push(
